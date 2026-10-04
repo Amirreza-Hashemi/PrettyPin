@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
-import Logo from "../components/layout/Logo";
+import Logo from "../components/header/mainHeader/Logo.jsx";
 
 export default function AuthHeader() {
     return (

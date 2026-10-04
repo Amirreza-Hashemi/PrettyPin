@@ -2,15 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Phone, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../layouts/AuthLayout.jsx";
-import { useAuth } from "../../context/AuthContext";
-import { findMockUser } from "../../data/mockUsers";
-import imgSrc from "../../assets/images/10.webp"
+import { useAuth } from "../../context/AuthContext.jsx";
+import imgSrc from "../../assets/images/10.webp";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({ phone: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -20,20 +20,19 @@ export default function LoginPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // TODO: بعد از اتصال API واقعی، این بخش با یک درخواست Axios به Django جایگزین می‌شود
-        const foundUser = findMockUser(formData.phone, formData.password);
-
-        if (!foundUser) {
-            setError("شماره موبایل یا رمز عبور اشتباه است");
-            return;
-        }
-
         setError("");
-        login({ fullName: foundUser.fullName, phone: foundUser.phone });
-        navigate("/");
+        setIsSubmitting(true);
+
+        try {
+            await login(formData.phone, formData.password);
+            navigate("/");
+        } catch (err) {
+            setError(err.message || "شماره موبایل یا رمز عبور اشتباه است");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -78,6 +77,7 @@ export default function LoginPage() {
                                 id="password"
                                 name="password"
                                 type={showPassword ? "text" : "password"}
+                                required
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder="رمز عبور خود را وارد کنید"
@@ -116,9 +116,10 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors"
+                        disabled={isSubmitting}
+                        className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-60"
                     >
-                        ورود
+                        {isSubmitting ? "در حال ورود..." : "ورود"}
                     </button>
                 </form>
 

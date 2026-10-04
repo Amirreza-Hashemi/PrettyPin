@@ -3,9 +3,7 @@ import ProductMainImage from "./ProductMainImage.jsx";
 import ProductThumbnails from "./ProductThumbnails.jsx";
 import SliderDots from "../../common/SliderDots.jsx";
 
-// این کامپوننت مسئول هماهنگی بین Thumbnails، Arrows و Dots است
-// activeIndex فقط یک بار اینجا نگه داشته می‌شود و به بچه‌ها پاس داده می‌شود (Lifting State Up)
-const ProductGallery = ({ images, badge }) => {
+const ProductGallery = ({ images, badge, alt }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     const goToPrev = () => {
@@ -28,11 +26,11 @@ const ProductGallery = ({ images, badge }) => {
                 <ProductMainImage
                     image={images[activeIndex]}
                     badge={badge}
+                    alt={alt}
                     onPrev={goToPrev}
                     onNext={goToNext}
                 />
 
-                {/* نقطه‌های زیر عکس - فقط در موبایل/تبلت، چون در دسکتاپ Thumbnails جایگزینش می‌شود */}
                 <div className="mt-4 flex justify-center lg:hidden">
                     <SliderDots
                         total={images.length}

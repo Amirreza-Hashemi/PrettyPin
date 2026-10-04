@@ -1,7 +1,7 @@
 import Container from "../common/Container.jsx";
-import { Truck, User } from "lucide-react";
+import { Quote, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const TopBar = () => {
     const { isLoggedIn, user } = useAuth();
@@ -11,8 +11,8 @@ const TopBar = () => {
             <Container>
                 <div className="flex items-center justify-between py-2">
                     <div className="flex items-center gap-2 text-xs font-medium text-gray-600 sm:text-sm">
-                        <Truck size={16} />
-                        <span>ارسال رایگان برای خرید بالای ۲ میلیون تومان</span>
+                        <Quote size={16} />
+                        <span>زیبایی در انتخاب توست</span>
                     </div>
 
                     {isLoggedIn ? (

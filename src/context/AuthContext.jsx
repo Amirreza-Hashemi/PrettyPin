@@ -1,32 +1,35 @@
 import { createContext, useContext, useReducer } from "react";
+import { loginRequest, registerRequest } from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = "prettypin_auth_user";
+const TOKEN_KEY = "prettypin_token";
+const USER_KEY = "prettypin_user";
 
 const initialState = {
     isLoggedIn: false,
-    user: null, // { fullName, phone }
+    user: null, // { fullName, phone, ... } — ساختار دقیق را بک‌اند مشخص می‌کند
+    token: null,
 };
 
 function authReducer(state, action) {
     switch (action.type) {
         case "LOGIN":
-            return { isLoggedIn: true, user: action.payload };
+            return { isLoggedIn: true, user: action.payload.user, token: action.payload.token };
         case "LOGOUT":
-            return { isLoggedIn: false, user: null };
+            return initialState;
         default:
             return state;
     }
 }
 
-// این تابع فقط یک‌بار، پیش از اولین رندر AuthProvider اجرا می‌شود
-// و state واقعی را از localStorage می‌خواند تا هنگام رفرش صفحه،
-// وضعیت لاگین بدون هیچ فلیکری بازیابی شود.
+// state اولیه را از localStorage می‌خواند تا هنگام رفرش صفحه، لاگین بدون فلیکر بازیابی شود
 function initAuthState() {
-    const savedUser = localStorage.getItem(STORAGE_KEY);
-    if (savedUser) {
-        return { isLoggedIn: true, user: JSON.parse(savedUser) };
+    const token = localStorage.getItem(TOKEN_KEY);
+    const savedUser = localStorage.getItem(USER_KEY);
+
+    if (token && savedUser) {
+        return { isLoggedIn: true, user: JSON.parse(savedUser), token };
     }
     return initialState;
 }
@@ -34,25 +37,36 @@ function initAuthState() {
 export function AuthProvider({ children }) {
     const [state, dispatch] = useReducer(authReducer, initialState, initAuthState);
 
-    const login = (userData) => {
-        // TODO: بعد از اتصال API واقعی، این‌جا Token دریافتی از سرور ذخیره می‌شود
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-        dispatch({ type: "LOGIN", payload: userData });
+    const persistSession = (user, token) => {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+    };
+
+    const login = async (phone, password) => {
+        const { user, token } = await loginRequest(phone, password);
+        persistSession(user, token);
+        dispatch({ type: "LOGIN", payload: { user, token } });
+    };
+
+    const register = async (fullName, phone, password) => {
+        const { user, token } = await registerRequest(fullName, phone, password);
+        persistSession(user, token);
+        dispatch({ type: "LOGIN", payload: { user, token } });
     };
 
     const logout = () => {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
         dispatch({ type: "LOGOUT" });
     };
 
     return (
-        <AuthContext.Provider value={{ ...state, login, logout }}>
+        <AuthContext.Provider value={{ ...state, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
 }
 
-// Custom Hook - به‌جای اینکه هرجا useContext(AuthContext) بنویسیم
 export function useAuth() {
     const context = useContext(AuthContext);
     if (!context) {

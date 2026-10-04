@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
 import { User, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
-import useClickOutside from "../../hooks/useClickOutside.js";
-import useAccountMenu from "../../hooks/useAccountMenu.js";
-import accountLinks from "../../data/accountLinks.js";
-import ConfirmDialog from "../common/ConfirmDialog.jsx";
+import useClickOutside from "../../../hooks/useClickOutside.js";
+import useAccountMenu from "../../../hooks/useAccountMenu.js";
+import accountLinks from "../../../data/accountLinks.js";
+import ConfirmDialog from "../../common/ConfirmDialog.jsx";
 
 const AccountMenu = () => {
     const [isOpen, setIsOpen] = useState(false);

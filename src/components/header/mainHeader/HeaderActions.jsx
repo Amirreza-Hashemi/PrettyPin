@@ -1,5 +1,5 @@
 import { Heart, ShoppingBag } from "lucide-react";
-import IconButton from "../common/IconButton.jsx";
+import IconButton from "../../common/IconButton.jsx";
 import AccountMenu from "./AccountMenu.jsx";
 
 const HeaderActions = ({ mobile = false }) => {
@@ -14,6 +14,7 @@ const HeaderActions = ({ mobile = false }) => {
                     <IconButton label="علاقه‌مندی‌ها">
                         <Heart size={20} />
                     </IconButton>
+
                     <AccountMenu />
                 </>
             )}

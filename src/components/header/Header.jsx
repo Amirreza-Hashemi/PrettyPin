@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TopBar from "./TopBar.jsx";
-import MainHeader from "./MainHeader.jsx";
+import MainHeader from "./mainHeader/MainHeader.jsx";
 import Navbar from "./Navbar.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 

@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-// این هوک منطق مشترک «حساب کاربری» را نگه می‌دارد تا هم در AccountMenu (دسکتاپ)
-// و هم در MobileMenu بدون تکرار کد استفاده شود.
 export default function useAccountMenu() {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const { isLoggedIn, user, logout } = useAuth();

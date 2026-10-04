@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Mail } from "lucide-react";
+import { Phone } from "lucide-react";
 
 const FooterNewsletter = () => {
-    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("عضویت با ایمیل:", email);
-        setEmail("");
+        console.log("عضویت با شماره تلفن:", phone);
+        setPhone("");
     };
 
     return (
@@ -22,21 +22,21 @@ const FooterNewsletter = () => {
                 className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row"
             >
                 <div className="relative flex-1">
-                    <Mail size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-black" />
+                    <Phone size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-black" />
                     <input
-                        type="email"
+                        type="tel"
                         dir="rtl"
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="ایمیل خود را وارد کن"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="شماره تلفن خود را وارد کن"
                         className="h-14 font-bold w-full rounded-full border-none pl-4 pr-11 text-right text-sm text-black bg-white outline-none"
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="h-12 shrink-0 rounded-full bg-gray-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
+                    className="h-14 shrink-0 rounded-full bg-gray-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
                 >
                     عضویت
                 </button>

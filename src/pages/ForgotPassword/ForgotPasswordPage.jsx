@@ -3,7 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { Phone, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import AuthLayout from "../../layouts/AuthLayout";
 import OtpInput from "../../components/common/OtpInput";
-import authImage from "../../assets/images/10.webp"; // مسیر خودت رو بذار
+import authImage from "../../assets/images/10.webp";
+import {
+    requestPasswordResetOtp,
+    verifyPasswordResetOtp,
+    confirmPasswordReset,
+} from "../../services/authService.js";
 
 const RESEND_SECONDS = 60;
 
@@ -11,9 +16,11 @@ export default function ForgotPasswordPage() {
     const [step, setStep] = useState("phone"); // "phone" | "otp" | "newPassword"
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState("");
+    const [resetToken, setResetToken] = useState("");
     const [passwords, setPasswords] = useState({ password: "", confirmPassword: "" });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [timer, setTimer] = useState(RESEND_SECONDS);
     const navigate = useNavigate();
 
@@ -23,39 +30,69 @@ export default function ForgotPasswordPage() {
         return () => clearInterval(interval);
     }, [step, timer]);
 
-    const handlePhoneSubmit = (e) => {
+    const handlePhoneSubmit = async (e) => {
         e.preventDefault();
-        // TODO: اتصال به API ارسال OTP
-        setTimer(RESEND_SECONDS);
-        setStep("otp");
+        setError("");
+        setIsSubmitting(true);
+        try {
+            await requestPasswordResetOtp(phone);
+            setTimer(RESEND_SECONDS);
+            setStep("otp");
+        } catch (err) {
+            setError(err.message || "ارسال کد تایید با خطا مواجه شد");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleOtpSubmit = (e) => {
+    const handleOtpSubmit = async (e) => {
         e.preventDefault();
         if (otp.length < 4) {
             setError("کد تایید را کامل وارد کنید");
             return;
         }
-        // TODO: اتصال به API بررسی OTP
+
         setError("");
-        setStep("newPassword");
+        setIsSubmitting(true);
+        try {
+            const { resetToken: token } = await verifyPasswordResetOtp(phone, otp);
+            setResetToken(token);
+            setStep("newPassword");
+        } catch (err) {
+            setError(err.message || "کد تایید نامعتبر است");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleResend = () => {
-        // TODO: اتصال به API ارسال مجدد
-        setOtp("");
-        setTimer(RESEND_SECONDS);
+    const handleResend = async () => {
+        setError("");
+        try {
+            await requestPasswordResetOtp(phone);
+            setOtp("");
+            setTimer(RESEND_SECONDS);
+        } catch (err) {
+            setError(err.message || "ارسال مجدد کد با خطا مواجه شد");
+        }
     };
 
-    const handlePasswordSubmit = (e) => {
+    const handlePasswordSubmit = async (e) => {
         e.preventDefault();
         if (passwords.password !== passwords.confirmPassword) {
             setError("رمز عبور و تکرار آن یکسان نیستند");
             return;
         }
-        // TODO: اتصال به API ثبت رمز جدید
+
         setError("");
-        navigate("/login");
+        setIsSubmitting(true);
+        try {
+            await confirmPasswordReset(resetToken, passwords.password);
+            navigate("/login");
+        } catch (err) {
+            setError(err.message || "ثبت رمز عبور جدید با خطا مواجه شد");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -88,11 +125,14 @@ export default function ForgotPasswordPage() {
                                 </div>
                             </div>
 
+                            {error && <p className="text-sm text-red-500 -mt-2">{error}</p>}
+
                             <button
                                 type="submit"
-                                className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-60"
                             >
-                                دریافت کد تایید
+                                {isSubmitting ? "در حال ارسال..." : "دریافت کد تایید"}
                             </button>
                         </form>
 
@@ -121,18 +161,19 @@ export default function ForgotPasswordPage() {
 
                             <button
                                 type="submit"
-                                className="w-full bg-primary hover:bg-primary-dark text-white my-5 py-3 rounded-xl font-medium transition-colors"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary hover:bg-primary-dark text-white my-5 py-3 rounded-xl font-medium transition-colors disabled:opacity-60"
                             >
-                                تایید کد
+                                {isSubmitting ? "در حال بررسی..." : "تایید کد"}
                             </button>
                         </form>
 
                         <div className="text-center text-sm text-gray-500 mt-6">
                             {timer > 0 ? (
                                 <span>
-                  ارسال مجدد کد تا {String(Math.floor(timer / 60)).padStart(2, "0")}:
+                                    ارسال مجدد کد تا {String(Math.floor(timer / 60)).padStart(2, "0")}:
                                     {String(timer % 60).padStart(2, "0")}
-                </span>
+                                </span>
                             ) : (
                                 <button onClick={handleResend} className="text-accent font-medium hover:underline">
                                     ارسال مجدد کد
@@ -195,9 +236,10 @@ export default function ForgotPasswordPage() {
 
                             <button
                                 type="submit"
-                                className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-60"
                             >
-                                ثبت رمز عبور جدید
+                                {isSubmitting ? "در حال ثبت..." : "ثبت رمز عبور جدید"}
                             </button>
                         </form>
                     </>
@@ -205,4 +247,4 @@ export default function ForgotPasswordPage() {
             </div>
         </AuthLayout>
     );
-}
+}s

@@ -4,23 +4,20 @@ import ProductPrice from "./ProductPrice.jsx";
 import ColorSelector from "./ColorSelector.jsx";
 import SizeSelector from "./SizeSelector.jsx";
 import AddToCartBar from "./AddToCartBar.jsx";
+import { useCart } from "../../../context/CartContext.jsx";
 
 const ProductInfo = ({ product }) => {
     const [selectedColor, setSelectedColor] = useState(product.colors[0]?.id);
     const [selectedSize, setSelectedSize] = useState(product.sizes[0]?.id);
     const [quantity, setQuantity] = useState(1);
 
+    const { addItem } = useCart();
+
     const handleIncrease = () => setQuantity((prev) => prev + 1);
     const handleDecrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
     const handleAddToCart = () => {
-        // TODO: بعد از ساخت Context سبد خرید (مرحله ۷ Roadmap)، اینجا dispatch اضافه می‌شود
-        console.log("افزودن به سبد:", {
-            productId: product.id,
-            color: selectedColor,
-            size: selectedSize,
-            quantity,
-        });
+        addItem(product, { color: selectedColor, size: selectedSize, quantity });
     };
 
     return (

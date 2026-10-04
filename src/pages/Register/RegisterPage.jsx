@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../layouts/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
-import { addMockUser, isPhoneTaken } from "../../data/mockUsers";
 import imgSrc from "../../assets/images/10.webp"
 
 export default function RegisterPage() {
@@ -24,7 +23,7 @@ export default function RegisterPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
@@ -32,22 +31,14 @@ export default function RegisterPage() {
             return;
         }
 
-        if (isPhoneTaken(formData.phone)) {
-            setError("این شماره موبایل قبلاً ثبت‌نام کرده است");
-            return;
-        }
-
         setError("");
 
-        // TODO: بعد از اتصال API واقعی، این بخش با یک درخواست Axios به Django جایگزین می‌شود
-        addMockUser({
-            fullName: formData.fullName,
-            phone: formData.phone,
-            password: formData.password,
-        });
-
-        login({ fullName: formData.fullName, phone: formData.phone });
-        navigate("/");
+        try {
+            await register(formData.fullName, formData.phone, formData.password);
+            navigate("/");
+        } catch (err) {
+            setError("خطا در ثبت‌نام. لطفاً دوباره تلاش کنید");
+        }
     };
 
     return (

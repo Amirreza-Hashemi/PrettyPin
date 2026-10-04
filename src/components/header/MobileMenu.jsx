@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Heart, User, ChevronDown, LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
-import SearchToggle from "./SearchToggle.jsx";
+import {useState} from "react";
+import {Heart, User, ChevronDown, LogIn} from "lucide-react";
+import {Link} from "react-router-dom";
+import SearchToggle from "./mainHeader/SearchToggle.jsx";
 import accountLinks from "../../data/accountLinks.js";
 import useAccountMenu from "../../hooks/useAccountMenu.js";
 import ConfirmDialog from "../common/ConfirmDialog.jsx";
@@ -18,7 +18,7 @@ const navLinks = [
     "تماس با ما",
 ];
 
-const MobileMenu = ({ isOpen, onClose }) => {
+const MobileMenu = ({isOpen, onClose}) => {
     const [isAccountOpen, setIsAccountOpen] = useState(false);
 
     const {
@@ -50,7 +50,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
 
     return (
         <div className="border-t border-gray-200 px-4 py-6 md:hidden">
-            <SearchToggle />
+            <SearchToggle/>
 
             <ul className="mt-6 flex flex-col gap-4">
                 {navLinks.map((item) => (
@@ -75,7 +75,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
                             className="flex w-full items-center justify-between text-sm font-semibold text-gray-800"
                         >
                 <span className="flex items-center gap-2">
-                  <User size={20} />
+                  <User size={20}/>
                   حساب کاربری
                 </span>
 
@@ -89,7 +89,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
 
                         {isAccountOpen && (
                             <ul className="mt-3 flex flex-col gap-1 pr-7">
-                                {accountLinks.map(({ id, label, href }) => (
+                                {accountLinks.map(({id, label, href}) => (
                                     <li key={id}>
                                         <a
                                             href={href}
@@ -109,7 +109,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="flex items-center gap-2 text-sm font-semibold text-gray-800 transition hover:text-pink-500"
                     >
-                        <LogIn size={20} />
+                        <LogIn size={20}/>
                         ورود / ثبت‌نام
                     </Link>
                 )}
@@ -118,7 +118,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
                     type="button"
                     className="mt-4 flex items-center gap-2 text-sm font-semibold text-gray-800"
                 >
-                    <Heart size={20} />
+                    <Heart size={20}/>
                     علاقه‌مندی‌ها
                 </button>
             </div>

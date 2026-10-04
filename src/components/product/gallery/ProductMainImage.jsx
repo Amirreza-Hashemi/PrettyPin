@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Heart, ChevronLeft, ChevronRight, Expand } from "lucide-react";
 
-const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
+const ProductMainImage = ({ image, alt = "تصویر محصول", badge, onPrev, onNext }) => {
     const [isFavorite, setIsFavorite] = useState(false);
-    const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomedImage, setZoomedImage] = useState(null);
+
+    const isZoomed = zoomedImage === image;
+
+    const handleToggleZoom = () => {
+        setZoomedImage(isZoomed ? null : image);
+    };
 
     return (
         <div className="relative overflow-hidden rounded-2xl bg-gray-50 sm:rounded-3xl">
@@ -17,6 +23,8 @@ const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
             {/* آیکون علاقه‌مندی - گوشه بالا-راست */}
             <button
                 type="button"
+                aria-label="افزودن به علاقه‌مندی‌ها"
+                aria-pressed={isFavorite}
                 onClick={() => setIsFavorite((prev) => !prev)}
                 className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition hover:scale-110 sm:h-10 sm:w-10"
             >
@@ -28,12 +36,13 @@ const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
 
             {/* تصویر اصلی */}
             <div className="flex flex-col items-center p-4">
-                <div className="overflow-hidden">
+                <div className="w-full overflow-hidden">
                     <img
                         src={image}
-                        alt={image}
-                        className={`transition-transform duration-500 ${isZoomed ? 'scale-150' : 'scale-100'}`}
-                        style={{objectFit: 'cover'}}
+                        alt={alt}
+                        className={`block w-full object-cover transition-transform duration-500 ${
+                            isZoomed ? "scale-150" : "scale-100"
+                        }`}
                     />
                 </div>
             </div>
@@ -41,6 +50,7 @@ const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
             {/* فلش قبلی */}
             <button
                 type="button"
+                aria-label="تصویر قبلی"
                 onClick={onPrev}
                 className="absolute left-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-800 shadow-md transition hover:bg-white sm:h-11 sm:w-11"
             >
@@ -50,6 +60,7 @@ const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
             {/* فلش بعدی */}
             <button
                 type="button"
+                aria-label="تصویر بعدی"
                 onClick={onNext}
                 className="absolute right-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-800 shadow-md transition hover:bg-white sm:h-11 sm:w-11"
             >
@@ -59,8 +70,10 @@ const ProductMainImage = ({ image, badge, onPrev, onNext }) => {
             {/* دکمه بزرگ‌نمایی - گوشه پایین-راست */}
             <button
                 type="button"
+                aria-label={isZoomed ? "خروج از بزرگ‌نمایی" : "بزرگ‌نمایی تصویر"}
+                aria-pressed={isZoomed}
+                onClick={handleToggleZoom}
                 className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition hover:scale-110 sm:h-10 sm:w-10"
-                onClick={() => setIsZoomed(!isZoomed)}
             >
                 <Expand size={16} className="text-gray-700" />
             </button>
