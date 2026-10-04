@@ -247,4 +247,4 @@ export default function ForgotPasswordPage() {
             </div>
         </AuthLayout>
     );
-}s
+};

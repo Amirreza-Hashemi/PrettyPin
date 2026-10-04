@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../layouts/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
-import imgSrc from "../../assets/images/10.webp"
+import imgSrc from "../../assets/images/10.webp";
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -14,8 +14,9 @@ export default function RegisterPage() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { login } = useAuth();
+    const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -32,12 +33,15 @@ export default function RegisterPage() {
         }
 
         setError("");
+        setIsSubmitting(true);
 
         try {
             await register(formData.fullName, formData.phone, formData.password);
             navigate("/");
         } catch (err) {
-            setError("خطا در ثبت‌نام. لطفاً دوباره تلاش کنید");
+            setError(err.message || "خطا در ثبت‌نام. لطفاً دوباره تلاش کنید");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -147,9 +151,10 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors"
+                        disabled={isSubmitting}
+                        className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-60"
                     >
-                        ثبت‌نام
+                        {isSubmitting ? "در حال ثبت‌نام..." : "ثبت‌نام"}
                     </button>
                 </form>
 
